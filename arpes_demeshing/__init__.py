@@ -1,0 +1,30 @@
+# -*- coding: UTF-8 -*-
+"""ARPES Demeshing — Dual U-Net Deep Image Prior for mesh artifact removal.
+
+Quick start::
+
+    import arpes_demeshing as ad
+
+    data, header = ad.load_txt("spectrum.txt")
+    result = ad.demesh(data, mode='fast', num_iter=3000)
+
+    # result.signal  → clean spectrum (np.ndarray)
+    # result.mesh    → extracted mesh pattern
+"""
+from ._config import DemeshConfig, DemeshResult
+from ._mask import make_rect_mask
+from .core import demesh
+from .io import load_pxt, load_txt, plot_comparison, save_result
+
+__version__ = "0.1.0"
+
+__all__ = [
+    "demesh",
+    "DemeshConfig",
+    "DemeshResult",
+    "load_txt",
+    "load_pxt",
+    "save_result",
+    "plot_comparison",
+    "make_rect_mask",
+]

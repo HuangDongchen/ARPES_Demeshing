@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Checkpoints and outputs
+checkpoint/*
+!checkpoint/.gitkeep
+
+# Data files (user provides their own)
+data/*
+!data/.gitkeep
+!data/ATest20250910120632.txt
+
+# Large binary files
+*.rar
+*.ibw
+*.itx
+*.bin
+*.pickle
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ruff / pytest cache
+.ruff_cache/
+.pytest_cache/

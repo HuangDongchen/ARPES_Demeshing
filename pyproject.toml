@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arpes-demeshing"
+version = "0.1.0"
+description = "Dual U-Net Deep Image Prior for ARPES mesh artifact removal"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+dependencies = [
+    "torch>=1.7.0",
+    "numpy>=1.19.0",
+    "matplotlib>=3.3.0",
+    "scikit-image>=0.17.0",
+    "opencv-python>=4.5.0",
+    "Pillow>=8.0.0",
+]
+
+[project.optional-dependencies]
+pxt = ["igor2>=0.5.0"]
+
+[project.scripts]
+arpes-demesh = "arpes_demeshing.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["arpes_demeshing*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py37"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"arpes_demeshing/models/*" = ["F401", "F403", "F405", "E741", "F841"]
+"arpes_demeshing/utils/common_utils.py" = ["F811", "W291", "W293"]
+"arpes_demeshing/utils/denoising_utils.py" = ["F403", "F405", "W291", "W293"]
