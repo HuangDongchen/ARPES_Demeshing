@@ -1,8 +1,14 @@
-torch>=1.13.0
-torchvision>=0.14.0
-numpy>=1.19.0
+# Core dependencies with tested version ranges
+# Tested with: torch 2.2.0+cpu, numpy 1.26.4, Python 3.10
+#
+# NOTE: torch latest (2.10.0) may have c10.dll issues on some Windows machines.
+#       If you encounter DLL errors, install a specific version:
+#       pip install torch==2.2.0 torchvision==0.17.0 --index-url https://download.pytorch.org/whl/cpu
+torch>=1.13.0,<2.7.0
+torchvision>=0.14.0,<0.22.0
+numpy>=1.19.0,<2.0
 matplotlib>=3.3.0
 scikit-image>=0.17.0
-opencv-python>=4.5.0
+opencv-python>=4.5.0,<4.11
 Pillow>=8.0.0
 igor2>=0.5.0
