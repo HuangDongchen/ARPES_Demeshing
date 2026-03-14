@@ -222,7 +222,7 @@ def demesh(
     lr_mesh=1.0,
     optimizer='sgd',
     lambda_max=0.5,
-    device='cuda:0',
+    device='auto',
     verbose=True,
     callback=None,
     save=False,
@@ -249,7 +249,7 @@ def demesh(
         lr_mesh: Learning rate for mesh network.
         optimizer: ``'sgd'`` or ``'adam'``.
         lambda_max: Stage 2 regularization weight (annealed to 0).
-        device: Torch device string, e.g. ``'cuda:0'`` or ``'cpu'``.
+        device: ``'auto'`` (detect best), ``'cuda:0'``, ``'mps'``, or ``'cpu'``.
         verbose: Print progress messages.
         callback: Optional ``callback(step, loss, signal_np, mesh_np)``.
         save: If True, auto-save results (txt + png + comparison) to *output_dir*.
@@ -270,7 +270,11 @@ def demesh(
         lr_signal=lr_signal, lr_mesh=lr_mesh, optimizer=optimizer,
         lambda_max=lambda_max,
     )
-    dev = torch.device(device)
+    if device == 'auto':
+        from ._device import get_best_device
+        dev = get_best_device()
+    else:
+        dev = torch.device(device)
 
     # --- Preprocessing ---
     img_raw = crop_array(data, d=1)

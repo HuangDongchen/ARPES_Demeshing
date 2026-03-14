@@ -10,6 +10,7 @@ def load_txt(path):
     """Load ARPES data from a tab-separated txt file.
 
     Expected format: first line = header string, remaining lines = numeric data.
+    Also supports SES format files where data starts after a `[Data 1]` marker.
 
     Args:
         path: Path to the .txt file.
@@ -18,8 +19,29 @@ def load_txt(path):
         (data, header): 2D numpy array and the header string.
     """
     with open(path, 'r') as f:
-        header = f.readline().rstrip('\n')
-    data = np.loadtxt(path, skiprows=1)
+        lines = f.readlines()
+
+    header_lines = []
+    data_start_idx = 0
+    is_ses_format = False
+
+    for i, line in enumerate(lines):
+        line_strip = line.strip()
+        if line_strip == '[Data 1]':
+            header_lines.append(line.rstrip('\n'))
+            data_start_idx = i + 1
+            is_ses_format = True
+            break
+        header_lines.append(line.rstrip('\n'))
+
+    if not is_ses_format:
+        # Fallback to standard 1-line header format
+        header_lines = [lines[0].rstrip('\n')]
+        data_start_idx = 1
+
+    header = '\n'.join(header_lines)
+    # Load the remaining lines into a numeric array
+    data = np.loadtxt(lines[data_start_idx:])
     return data, header
 
 

@@ -24,17 +24,53 @@ The total reconstruction equals the sum of both networks' outputs. By exploiting
 
 ## Installation
 
+**Requirements**: Python 3.8+, GPU recommended but not required.
+
+### Quick Install (CPU — all platforms)
+
 ```bash
-# Clone and install
 git clone https://github.com/huangdongchen/arpes_demeshing.git
 cd arpes_demeshing
 pip install -e .
-
-# For Igor Pro .pxt file support
-pip install igor2
 ```
 
-**Requirements**: Python 3.7+, CUDA-capable GPU recommended.
+This installs all dependencies including PyTorch (CPU version). The package
+automatically detects the best available backend at runtime.
+
+### NVIDIA GPU (CUDA acceleration)
+
+Install the CUDA version of PyTorch **first**, then install this package:
+
+```bash
+# Step 1: Install PyTorch with CUDA (example: CUDA 12.1)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# Step 2: Install this package
+git clone https://github.com/huangdongchen/arpes_demeshing.git
+cd arpes_demeshing
+pip install -e .
+```
+
+> Visit [pytorch.org/get-started](https://pytorch.org/get-started/locally/) to
+> find the correct `--index-url` for your CUDA version.
+
+### Apple Silicon (MPS acceleration)
+
+On macOS with Apple Silicon, `pip install torch` automatically includes MPS
+support — no extra steps needed:
+
+```bash
+git clone https://github.com/huangdongchen/arpes_demeshing.git
+cd arpes_demeshing
+pip install -e .
+```
+
+### Verify installation
+
+```bash
+python -c "import arpes_demeshing as ad; print(ad.get_best_device())"
+# Expected output: cuda:0 / mps / cpu
+```
 
 ## Quick Start
 
@@ -94,13 +130,14 @@ arpes-demesh --image data/file.pxt --mask_x 0 --mask_y 50 --mask_w 100 --mask_h 
 arpes-demesh --image data/your_data.txt --mode quality --num_iter 4000
 ```
 
-## Complete Example
+## Complete Examples
 
+### Example 1: Standard Data File
 ```python
 import arpes_demeshing as ad
 import matplotlib.pyplot as plt
 
-# Step 1: Load ARPES data
+# Step 1: Load standard ARPES data
 data, header = ad.load_txt("data/ATest20250910120632.txt")
 print(f"Loaded: {data.shape}, range=[{data.min():.1f}, {data.max():.1f}]")
 
@@ -113,21 +150,37 @@ result = ad.demesh(
     mesh_l1=0.05,
     save=True,
     output_dir='./checkpoint',
-    output_name='example',
+    output_name='example_atest',
 )
 
 # Step 3: Inspect results
 print(f"Signal shape: {result.signal.shape}")
 print(f"Final loss: {result.loss_history[-1]:.6f}")
 
-# Step 4: Further analysis on the clean signal
-# result.signal is a standard numpy array — use it with any analysis tool
-from scipy.ndimage import gaussian_filter
-smoothed = gaussian_filter(result.signal, sigma=2)
-
-# Step 5: Or generate a custom comparison plot
+# Step 4: Or generate a custom comparison plot
 fig = ad.plot_comparison(data, result)
 plt.show()
+```
+
+### Example 2: SES Format Data / Coordinate Axis
+Some plain text data formats (like SES output) use a `[Data 1]` marker and include the coordinate axis as the first column.
+
+```python
+import arpes_demeshing as ad
+
+# load_txt automatically detects the [Data 1] region
+data, header = ad.load_txt("data/spin0004.txt")
+
+# Check if the first column is a strictly increasing coordinate axis
+is_axis_col = all(data[i, 0] < data[i+1, 0] for i in range(len(data)-1))
+
+if is_axis_col:
+    axis = data[:, 0]
+    img_data = data[:, 1:]  # Pass only the image to the demesh pipeline
+else:
+    img_data = data
+
+result = ad.demesh(img_data, save=True, output_name='spin0004_result')
 ```
 
 ## Package Structure
@@ -163,7 +216,7 @@ arpes_demeshing/
 | `width` | 128 | Network channel width |
 | `use_coord` | `True` | Append (x, y) coordinate channels to signal network |
 | `save` | `False` | Auto-save results + comparison plot |
-| `device` | `cuda:0` | Torch device (`cuda:0`, `cpu`, etc.) |
+| `device` | `auto` | Auto-detect best backend (CUDA → MPS → CPU), or specify `'cuda:0'` / `'mps'` / `'cpu'` |
 
 ## How It Works
 

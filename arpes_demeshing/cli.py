@@ -24,8 +24,8 @@ def main():
                         help="Output filename prefix")
     parser.add_argument("--output_dir", type=str, default="./checkpoint",
                         help="Output directory")
-    parser.add_argument("--gpu", type=str, default="0",
-                        help="GPU device index")
+    parser.add_argument("--device", type=str, default="auto",
+                        help="Torch device: 'auto' (detect best), 'cuda:0', 'mps', or 'cpu'")
     parser.add_argument("--row_cut_index", default=0, type=int,
                         help="Crop rows from bottom (0 = no crop)")
 
@@ -74,9 +74,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Set CUDA device before importing torch-dependent modules
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-
 
     from arpes_demeshing import demesh, load_pxt, load_txt, save_result
     from arpes_demeshing._mask import make_rect_mask
@@ -111,7 +108,7 @@ def main():
         num_scales=args.num_scales, skip_channels=args.skip_channels,
         lr_signal=args.lr_signal, lr_mesh=args.lr_mesh,
         optimizer=args.optimizer, lambda_max=args.lambda_max,
-        device='cuda:0',
+        device=args.device,
     )
 
     # --- Save ---

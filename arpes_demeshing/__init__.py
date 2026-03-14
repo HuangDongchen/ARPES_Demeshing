@@ -12,14 +12,16 @@ Quick start::
     # result.mesh    → extracted mesh pattern
 """
 from ._config import DemeshConfig, DemeshResult
+from ._device import get_best_device
 from ._mask import make_rect_mask
 from .core import demesh
 from .io import load_pxt, load_txt, plot_comparison, save_result
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "demesh",
+    "get_best_device",
     "DemeshConfig",
     "DemeshResult",
     "load_txt",
@@ -28,3 +30,4 @@ __all__ = [
     "plot_comparison",
     "make_rect_mask",
 ]
+
