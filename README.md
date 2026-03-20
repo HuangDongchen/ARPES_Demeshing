@@ -20,6 +20,7 @@ The total reconstruction equals the sum of both networks' outputs. By exploiting
 - **Asymmetric Coordinate Injection**: Normalized (x, y) coordinates for improved spatial awareness
 - **L1 Sparsity Regularization**: Encourages the mesh network to produce sparse outputs
 - **PXT File Support**: Direct reading of Igor Pro `.pxt` packed experiment files
+- **IBW File Support**: Read and write Igor Binary Wave v5 (`.ibw`) files with full axis preservation
 - **Auto-Save**: One-call `demesh(save=True)` generates data files and comparison plots
 
 ## Installation
@@ -80,7 +81,7 @@ python -c "import arpes_demeshing as ad; print(ad.get_best_device())"
 import arpes_demeshing as ad
 
 # Load data
-data, header = ad.load_txt("data/your_spectrum.txt")  # or ad.load_pxt("data/file.pxt")
+data, header = ad.load_txt("data/your_spectrum.txt")  # or ad.load_pxt() / ad.load_ibw()
 
 # Run demeshing with auto-save
 result = ad.demesh(
@@ -125,6 +126,12 @@ arpes-demesh --image data/your_data.txt --num_iter 4000 --ckpt my_result
 
 # With PXT file and mask
 arpes-demesh --image data/file.pxt --mask_x 0 --mask_y 50 --mask_w 100 --mask_h 100
+
+# IBW file (auto-outputs as .ibw)
+arpes-demesh --image data/spectrum.ibw --num_iter 4000 --ckpt my_result
+
+# IBW input, force txt output
+arpes-demesh --image data/spectrum.ibw --output_fmt txt --ckpt my_result
 
 # Quality mode (coarse-to-fine refinement)
 arpes-demesh --image data/your_data.txt --mode quality --num_iter 4000
@@ -195,10 +202,11 @@ arpes_demeshing/
 │   ├── core.py                  # demesh() — main algorithm
 │   ├── _config.py               # DemeshConfig / DemeshResult
 │   ├── _mask.py                 # Mask utilities
-│   ├── io.py                    # load_txt / load_pxt / save_result / plot_comparison
+│   ├── __main__.py              # python -m arpes_demeshing support
+│   ├── io.py                    # load_txt / load_pxt / load_ibw / save_result / save_result_ibw
 │   ├── cli.py                   # arpes-demesh CLI entry point
 │   ├── models/                  # Neural network architectures (U-Net)
-│   └── utils/                   # Image/tensor conversion, scaling, PXT reader
+│   └── utils/                   # Image/tensor conversion, scaling, PXT/IBW readers
 ├── data/                        # Place input files here
 └── checkpoint/                  # Default output directory
 ```
@@ -256,3 +264,6 @@ If you find this tool useful in your research, please cite:
 ## License
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
+
+## Contributor
+Yiwen Chen and Hengrui Dong 

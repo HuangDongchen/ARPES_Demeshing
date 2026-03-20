@@ -17,7 +17,7 @@ from ._mask import make_rect_mask
 from .core import demesh
 from .io import load_ibw, load_pxt, load_txt, plot_comparison, save_result, save_result_ibw
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "demesh",
