@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arpes-demeshing"
-version = "0.2.0"
+version = "0.3.0"
 description = "Dual U-Net Deep Image Prior for ARPES mesh artifact removal"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -52,7 +52,7 @@ include = ["arpes_demeshing*"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py37"
+target-version = "py38"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]

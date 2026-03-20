@@ -69,12 +69,25 @@ def load_ibw(path):
     Returns:
         (data_2d, axes): 2D numpy array and list of axis arrays.
             Each axis array gives the physical coordinate for that dimension.
+
+    .. note::
+        For >2D data, only the first 2D slice is returned.
+        Full 3D spectrum support is under development.
     """
+    import warnings
+
     from .utils.ibw import ibw_to_mat
     mat, axes = ibw_to_mat(path)
     # Reduce >2D to 2D by taking first slice on extra dims
     if mat.ndim > 2:
+        warnings.warn(
+            f"IBW file contains {mat.ndim}D data (shape {mat.shape}). "
+            f"Only the first 2D slice [:, :, 0, ...] is used. "
+            f"Full 3D spectrum support is under development.",
+            stacklevel=2,
+        )
         mat = mat[(slice(None), slice(None)) + (0,) * (mat.ndim - 2)]
+        axes = axes[:2]
     return mat, axes
 
 

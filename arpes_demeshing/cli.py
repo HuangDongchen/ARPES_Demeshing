@@ -5,6 +5,8 @@ Usage::
 
     arpes-demesh --image data/test.txt --num_iter 3000 --ckpt my_result
     arpes-demesh --image data/test.pxt --mode quality --mask_x 0 --mask_y 50 --mask_w 100 --mask_h 100
+    arpes-demesh --image data/spectrum.ibw --num_iter 3000 --ckpt my_result
+    arpes-demesh --image data/spectrum.ibw --output_fmt txt --ckpt my_result
 """
 import argparse
 import os
