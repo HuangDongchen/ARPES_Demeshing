@@ -3,9 +3,11 @@ IBW (Igor Binary Wave v5) <-> NumPy conversion.
 Public API: ibw_to_mat(filepath) and mat_to_ibw(name, path, mat, xs, xd, ys, yd, zs, zd).
 """
 from __future__ import annotations
-import os, struct
+
+import os
+import struct
+
 import numpy as np
-from typing import List, Tuple
 
 MAXDIMS = 4
 NT_CMPLX     = 0x01
@@ -18,6 +20,7 @@ NT_UNSIGNED  = 0x40
 
 WAVEHEADER5_SIZE = 320
 BINHEADER5_SIZE = 64
+
 
 def _dtype_to_typecode(dtype: np.dtype):
     dt = np.dtype(dtype)
@@ -39,12 +42,14 @@ def _dtype_to_typecode(dtype: np.dtype):
         return NT_I32 | NT_UNSIGNED, 4
     raise ValueError(f"Unsupported dtype for IBW v5: {dt}")
 
+
 def _compute_checksum(bh: bytes, wh: bytes) -> int:
     data = bh + wh
     words = struct.unpack('<' + 'h' * ((BINHEADER5_SIZE + WAVEHEADER5_SIZE)//2), data[:(BINHEADER5_SIZE + WAVEHEADER5_SIZE)])
     s = sum(words) & 0xFFFF
     checksum = (-s) & 0xFFFF
     return checksum
+
 
 def mat_to_ibw(name: str, path: str, mat: np.ndarray,
                xs: float=0, xd: float=1, ys: float=0, yd: float=1, zs: float=0, zd: float=1,
@@ -93,12 +98,16 @@ def mat_to_ibw(name: str, path: str, mat: np.ndarray,
     os.makedirs(path, exist_ok=True)
     fullpath = os.path.join(path, f"{name}.ibw")
     with open(fullpath, 'wb') as f:
-        f.write(bh); f.write(wh); f.write(np.ascontiguousarray(mat).tobytes(order='F'))
+        f.write(bh)
+        f.write(wh)
+        f.write(np.ascontiguousarray(mat).tobytes(order='F'))
     return fullpath
+
 
 def ibw_to_mat(filepath: str):
     with open(filepath, 'rb') as f:
-        bh = f.read(BINHEADER5_SIZE); wh = f.read(WAVEHEADER5_SIZE)
+        _ = f.read(BINHEADER5_SIZE)
+        wh = f.read(WAVEHEADER5_SIZE)
         dims = [struct.unpack('<i', wh[68 + 4*i:72 + 4*i])[0] for i in range(MAXDIMS)]
         dims = [d for d in dims if d > 0]
         ndim = len(dims)
@@ -132,3 +141,4 @@ def ibw_to_mat(filepath: str):
         offset = struct.unpack('<d', wh[116 + 8*i : 124 + 8*i])[0]
         axes.append(offset + delta * np.arange(dims[i]))
     return mat, axes
+
