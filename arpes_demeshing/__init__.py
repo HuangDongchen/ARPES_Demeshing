@@ -15,7 +15,7 @@ from ._config import DemeshConfig, DemeshResult
 from ._device import get_best_device
 from ._mask import make_rect_mask
 from .core import demesh
-from .io import load_pxt, load_txt, plot_comparison, save_result
+from .io import load_ibw, load_pxt, load_txt, plot_comparison, save_result, save_result_ibw
 
 __version__ = "0.2.0"
 
@@ -26,7 +26,9 @@ __all__ = [
     "DemeshResult",
     "load_txt",
     "load_pxt",
+    "load_ibw",
     "save_result",
+    "save_result_ibw",
     "plot_comparison",
     "make_rect_mask",
 ]

@@ -19,11 +19,14 @@ def main():
 
     # --- I/O ---
     parser.add_argument("--image", type=str, required=True,
-                        help="Input file path (.txt or .pxt)")
+                        help="Input file path (.txt, .pxt, or .ibw)")
     parser.add_argument("--ckpt", type=str, default="result",
                         help="Output filename prefix")
     parser.add_argument("--output_dir", type=str, default="./checkpoint",
                         help="Output directory")
+    parser.add_argument("--output_fmt", type=str, default=None,
+                        choices=['txt', 'ibw'],
+                        help="Output format (default: auto-detect from input)")
     parser.add_argument("--device", type=str, default="auto",
                         help="Torch device: 'auto' (detect best), 'cuda:0', 'mps', or 'cpu'")
     parser.add_argument("--row_cut_index", default=0, type=int,
@@ -75,17 +78,26 @@ def main():
     args = parser.parse_args()
 
 
-    from arpes_demeshing import demesh, load_pxt, load_txt, save_result
+    from arpes_demeshing import demesh, load_ibw, load_pxt, load_txt, save_result, save_result_ibw
     from arpes_demeshing._mask import make_rect_mask
 
     # --- Load data ---
     image_path = args.image
-    if image_path.endswith('.pxt'):
+    axes = None
+    header = ''
+    if image_path.endswith('.ibw'):
+        data, axes = load_ibw(image_path)
+    elif image_path.endswith('.pxt'):
         data, header = load_pxt(image_path)
     else:
         if not image_path.endswith('.txt'):
             image_path = image_path + '.txt'
         data, header = load_txt(image_path)
+
+    # Determine output format
+    output_fmt = args.output_fmt
+    if output_fmt is None:
+        output_fmt = 'ibw' if image_path.endswith('.ibw') else 'txt'
 
     if args.row_cut_index > 0:
         data = data[:args.row_cut_index, :]
@@ -112,7 +124,10 @@ def main():
     )
 
     # --- Save ---
-    save_result(result, args.output_dir, args.ckpt, header)
+    if output_fmt == 'ibw':
+        save_result_ibw(result, args.output_dir, args.ckpt, axes=axes, original=data)
+    else:
+        save_result(result, args.output_dir, args.ckpt, header, original=data)
     print(f"\nDone! Results saved to {args.output_dir}/{args.ckpt}_*")
     print(f"  Signal shape: {result.signal.shape}")
     print(f"  Signal range: [{result.signal.min():.1f}, {result.signal.max():.1f}]")

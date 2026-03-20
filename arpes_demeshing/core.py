@@ -228,6 +228,8 @@ def demesh(
     save=False,
     output_dir='./checkpoint',
     output_name='result',
+    output_fmt='txt',
+    output_axes=None,
 ):
     """Remove mesh artifacts from a 2D ARPES spectrum.
 
@@ -255,6 +257,8 @@ def demesh(
         save: If True, auto-save results (txt + png + comparison) to *output_dir*.
         output_dir: Directory for saved files (used when ``save=True``).
         output_name: Filename prefix for saved files.
+        output_fmt: ``'txt'`` or ``'ibw'`` — output file format.
+        output_axes: Optional axis arrays for IBW output (from ``load_ibw``).
 
     Returns:
         DemeshResult: Contains ``signal``, ``mesh``, ``loss_history``, etc.
@@ -361,8 +365,13 @@ def demesh(
 
     # --- Auto-save ---
     if save:
-        from .io import save_result as _save_result
-        _save_result(result, output_dir, output_name, original=data)
+        if output_fmt == 'ibw':
+            from .io import save_result_ibw
+            save_result_ibw(result, output_dir, output_name,
+                            axes=output_axes, original=data)
+        else:
+            from .io import save_result as _save_result
+            _save_result(result, output_dir, output_name, original=data)
         if verbose:
             print(f"Results saved to {output_dir}/{output_name}_*")
 
